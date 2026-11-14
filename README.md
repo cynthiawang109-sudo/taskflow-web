@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# TaskFlow web
 
-## Getting Started
+A Next.js App Router + TypeScript frontend for the fictional TaskFlow FastAPI demo-app. All API requests run directly from the browser; no credentials or backend proxy are needed.
 
-First, run the development server:
+Live demo: <deployment URL goes here>
 
-```bash
+## Run locally
+
+Use Node.js major 26 (see `.nvmrc`) and npm.
+
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. To use a different API, create `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```dotenv
+NEXT_PUBLIC_API_BASE_URL=https://taskflow-demo-app.onrender.com
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+That URL is also the default. Next.js embeds public environment variables at build time, so set it before building. A custom API must permit browser requests from your frontend origin via CORS.
 
-## Learn More
+## API and behavior
 
-To learn more about Next.js, take a look at the following resources:
+The frontend consumes only `GET /health`, `GET /v1/tasks` (status, cursor, limit), `POST /v1/tasks`, `GET /v1/tasks/{id}`, and `GET/POST /v1/tasks/{id}/comments`. Statuses and deletion cannot be changed through this API.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The board has All / To do / Doing / Done filters, explicit Load more pagination, and task creation. A newly created task appears immediately in All. Detail pages load every comment page to find each revision chain's current head. Superseded revisions sit in collapsed, struck-through history beneath their successor. Select a current head to revise it; conflicts use the stable `conflict` code and offer Reload thread while preserving your draft.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Health distinguishes operational, degraded, and unreachable states. After three seconds, a pending health check displays a free-tier wake-up message; requests time out after 60 seconds and can be retried.
 
-## Deploy on Vercel
+Fictional data only. The demo is public, comments retain revision history, and the service's ephemeral data can reset on restart. Do not enter personal or sensitive information.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Checks
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sh
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm start
+```
+
+Vitest + Testing Library cover mocked API error envelopes, stable error codes, cursors, health, revision payloads, and collapsed comment revision chains. CI runs lint, strict TypeScript, tests, and a production build on pushes and pull requests.
+
+Source layout: `app/` routes and the single global stylesheet, `components/` comment chains, `lib/api.ts` typed client, `tests/` unit/component tests, and `.github/workflows/ci.yml`.
