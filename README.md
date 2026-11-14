@@ -2,7 +2,10 @@
 
 A Next.js App Router + TypeScript frontend for the fictional TaskFlow FastAPI demo-app. All API requests run directly from the browser; no credentials or backend proxy are needed.
 
-Live demo: <deployment URL goes here>
+Live demo: https://taskflow-web-snowy.vercel.app
+Deployed on Vercel (Hobby) from this repository's `main`; it talks to the public demo API at
+https://taskflow-demo-app.onrender.com, whose free tier sleeps when idle - the board's status
+indicator shows a waking state until the API answers.
 
 ## Run locally
 
